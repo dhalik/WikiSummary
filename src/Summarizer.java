@@ -4,18 +4,26 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.regex.*;
 
-public class StripPage {
+public class Summarizer {
 	
-	public static void main(String[] args){
+	String summary;
+	
+	public Summarizer(String inputFile){
 		String content;
+		Scanner reader = null;
 		try {
-			content = new Scanner(new File("infinity")).useDelimiter("\\Z").next();
+			File input = new File(inputFile);
+			reader = new Scanner(input);
+			content = reader.useDelimiter("\\Z").next();
 			Pattern p = Pattern.compile("<p>.+?</p>");
 			Matcher m = p.matcher(content);
 			m.find();
-			System.out.println(content.substring(m.start(), m.end()));
+			summary = content.substring(m.start(), m.end());
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		}
+		finally {
+			reader.close();
 		}
 	}
 	
