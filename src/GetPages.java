@@ -59,6 +59,8 @@ public class GetPages {
 			}
 			System.out.println(listofTopics.get(i).getName());
 			listofTopics.get(i).cleanPages();
+			listofTopics.get(i).createSummaries();
+			System.out.println(listofTopics.get(i).summarize());
 		}
 	}
 	
