@@ -1,30 +1,62 @@
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.*;
 
 public class Summarizer {
 	
 	String summary;
+	Logger logger = Logger.getLogger("MainLog");
 	
-	public Summarizer(String inputFile){
-		String content;
-		Scanner reader = null;
+	public Summarizer(String inputUrl){
+		Pattern p = Pattern.compile("<p>.+?</p>",Pattern.DOTALL);
+		
+		
+		URL url;
+		InputStream is;
+		BufferedReader reader = null;
+		String line;
+		
 		try {
-			File input = new File(inputFile);
-			reader = new Scanner(input);
-			content = reader.useDelimiter("\\Z").next();
-			Pattern p = Pattern.compile("<p>.+?</p>");
-			Matcher m = p.matcher(content);
-			m.find();
-			summary = content.substring(m.start(), m.end());
+			url = new URL(inputUrl);
+			is =  url.openStream();
+			logger.log(Level.FINE,"Created Connection");
+			reader = new BufferedReader (new InputStreamReader(is));
+			logger.log(Level.FINE,"Opened Reader");
+						
+			while ((line = reader.readLine()) != null){
+				Matcher m = p.matcher(line);
+				if (m.find()){
+					summary = line.substring(m.start(), m.end());
+					break;
+				}
+			}
+			
 		} catch (FileNotFoundException e) {
+			logger.log(Level.SEVERE,"Could not open reader");
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.log(Level.SEVERE,"Could not read from reader");
 			e.printStackTrace();
 		}
 		finally {
-			reader.close();
+			try {
+				reader.close();
+			} catch (IOException e) {
+				logger.log(Level.SEVERE,"Could not close file");
+				e.printStackTrace();
+			}
 		}
+	}
+	
+	public String getSummary(){
+		return summary;
 	}
 	
 }
